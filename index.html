@@ -42,19 +42,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rozha+One&family=Yantramanav:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script>
       // Suppress expected Vite HMR WebSocket connection errors in AI Studio iframe proxy
-      window.addEventListener('error', function(e) {
-        if (e.message && (e.message.includes('WebSocket') || e.message.includes('ws://') || e.message.includes('wss://'))) {
-          e.stopImmediatePropagation();
-          e.preventDefault();
-        }
-      }, true);
-      window.addEventListener('unhandledrejection', function(e) {
-        var msg = (e.reason && (e.reason.message || e.reason)) || '';
-        if (typeof msg === 'string' && (msg.includes('WebSocket') || msg.includes('ws://') || msg.includes('wss://'))) {
-          e.stopImmediatePropagation();
-          e.preventDefault();
-        }
-      }, true);
+      (function() {
+        var isWsError = function(str) {
+          if (!str) return false;
+          var s = String(str);
+          return s.includes('WebSocket') || s.includes('ws://') || s.includes('wss://') || s.includes('closed without opened');
+        };
+
+        window.addEventListener('error', function(e) {
+          if (isWsError(e.message) || isWsError(e.error && e.error.message)) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            return true;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(e) {
+          var msg = (e.reason && (e.reason.message || e.reason)) || '';
+          if (isWsError(msg)) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+          }
+        }, true);
+
+        var origConsoleError = console.error;
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var joined = args.map(function(a) { return (a && a.message) || String(a); }).join(' ');
+          if (isWsError(joined)) {
+            return;
+          }
+          return origConsoleError.apply(console, args);
+        };
+      })();
     </script>
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-indigo-500 selection:text-white">
