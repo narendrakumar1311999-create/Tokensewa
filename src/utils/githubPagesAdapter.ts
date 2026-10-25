@@ -605,52 +605,62 @@ async function handleMockApi(path: string, options: RequestInit = {}): Promise<R
 export function initGitHubPagesAdapter() {
   if (typeof window === 'undefined') return;
 
-  const originalFetch = window.fetch.bind(window);
+  // Only activate client-side mock adapter when running on GitHub Pages (github.io)
+  // or local file:// environment without an active Node backend.
+  const isGitHubPages =
+    window.location.hostname.endsWith('github.io') ||
+    window.location.protocol === 'file:' ||
+    sessionStorage.getItem('ghp_offline_mode') === 'true';
 
-  window.fetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-    const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+  if (!isGitHubPages) {
+    // In live backend environments (AI Studio, Cloud Run, Render, VPS), do not alter window.fetch
+    return;
+  }
 
-    // Check if this is an API call
-    if (url.includes('/api/')) {
-      // Normalize URL relative path
-      const apiPath = url.startsWith('http') ? new URL(url).pathname + new URL(url).search : url;
+  try {
+    const originalFetch = window.fetch ? window.fetch.bind(window) : null;
 
-      // On GitHub Pages, always use the client-side mock adapter
-      const isGitHubPages =
-        window.location.hostname.includes('github.io') ||
-        window.location.protocol === 'file:' ||
-        sessionStorage.getItem('ghp_offline_mode') === 'true';
+    const customFetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
-      if (isGitHubPages) {
+      if (url.includes('/api/')) {
+        const apiPath = url.startsWith('http') ? new URL(url).pathname + new URL(url).search : url;
         const mockRes = await handleMockApi(apiPath, init);
         if (mockRes) return mockRes;
       }
 
-      // Try the real server first in normal environments
+      if (originalFetch) {
+        return originalFetch(input, init);
+      }
+      return new Response(JSON.stringify({ success: false, error: 'Endpoint not available' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    };
+
+    // Safely apply customFetch without triggering "Cannot set property fetch of #<Window> which has only a getter"
+    try {
+      Object.defineProperty(window, 'fetch', {
+        value: customFetch,
+        configurable: true,
+        writable: true,
+      });
+    } catch {
       try {
-        const response = await originalFetch(input, init);
-        // If server returns 404 or fails on static host, fallback seamlessly to client adapter
-        if (response.status === 404 && !url.includes('/api/auth/me')) {
-          const fallbackRes = await handleMockApi(apiPath, init);
-          if (fallbackRes) {
-            sessionStorage.setItem('ghp_offline_mode', 'true');
-            return fallbackRes;
-          }
-        }
-        return response;
-      } catch (networkErr) {
-        // Network failure (offline or static hosting)
-        const fallbackRes = await handleMockApi(apiPath, init);
-        if (fallbackRes) {
-          sessionStorage.setItem('ghp_offline_mode', 'true');
-          return fallbackRes;
-        }
-        throw networkErr;
+        (window as any).fetch = customFetch;
+      } catch {
+        try {
+          Object.defineProperty(Window.prototype, 'fetch', {
+            value: customFetch,
+            configurable: true,
+            writable: true,
+          });
+        } catch {}
       }
     }
 
-    return originalFetch(input, init);
-  };
-
-  console.log('[TokenQueue] GitHub Pages & Static Hosting Adapter initialized successfully.');
+    console.log('[TokenQueue] GitHub Pages client-side storage adapter active.');
+  } catch (err) {
+    console.warn('[TokenQueue] Could not initialize GitHub Pages adapter:', err);
+  }
 }
