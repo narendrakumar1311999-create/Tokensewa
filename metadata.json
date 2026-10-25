@@ -1,0 +1,6 @@
+{
+  "name": "Smart Token & Queue Manager",
+  "description": "QR code token generation and digital queue management system with 10-minute automated time slots and live data sheet.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

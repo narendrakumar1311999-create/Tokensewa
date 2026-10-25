@@ -1,0 +1,13 @@
+[
+  {
+    "id": "usr_c_1792772852610_bitod",
+    "name": "राजेश कुमार",
+    "email": "rajesh@example.com",
+    "passwordHash": "f660c7fb1291f4a504161fa531d518834b2fec800bffc8569dcfce5b79487e860063d855f32d52476f244a7b747fa823149349f43edea53bfbff9e681380f03f",
+    "salt": "98bbd5a40c4fd632ab59d0727bf341c2",
+    "mobile": "9876543299",
+    "aadhaar": "987654321099",
+    "createdAt": "2026-10-23T16:27:32.610Z",
+    "lastLoginAt": "2026-10-23T16:27:32.610Z"
+  }
+]

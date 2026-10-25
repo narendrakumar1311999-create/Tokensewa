@@ -1,0 +1,26 @@
+[
+  {
+    "id": "usr_owner_main",
+    "name": "मुख्य संचालक (Admin/Owner)",
+    "username": "admin",
+    "pin": "2810",
+    "role": "owner",
+    "createdAt": "2026-10-20T03:59:56.356Z"
+  },
+  {
+    "id": "usr_staff_1",
+    "name": "काउंटर ऑपरेटर 1 (Staff 1)",
+    "username": "staff1",
+    "pin": "2811",
+    "role": "staff",
+    "createdAt": "2026-10-20T03:59:56.357Z"
+  },
+  {
+    "id": "usr_staff_2",
+    "name": "काउंटर ऑपरेटर 2 (Staff 2)",
+    "username": "staff2",
+    "pin": "2580",
+    "role": "staff",
+    "createdAt": "2026-10-20T04:00:17.832Z"
+  }
+]

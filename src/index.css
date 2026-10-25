@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@layer utilities {
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    
+    body {
+      background: #ffffff !important;
+      color: #000000 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    #printable-slip {
+      box-shadow: none !important;
+      border: 1px dashed #000000 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      page-break-inside: avoid;
+    }
+
+    nav, footer {
+      display: none !important;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "centerName": "ऑनलाइन फ्री टोकन सेवा (Online Free Token Seva)",
+  "centerAddress": "गौर मिर्ज़ामुराद थाना के पीछे 221307",
+  "startHour": 10,
+  "startMinute": 0,
+  "endHour": 16,
+  "endMinute": 0,
+  "slotIntervalMinutes": 10,
+  "countersCount": 2,
+  "autoAnnounceVoice": true,
+  "disruption": {
+    "isPaused": false,
+    "reasonType": "server_error",
+    "message": "UIDAI सर्वर एरर के कारण आज के सभी शेष 8 टोकन को कल (2026-10-22) सुबह 9:00 AM से आगे पुनः आवंटित कर दिया गया है।",
+    "pausedAt": "2026-10-20T14:55:09.245Z"
+  }
+}
